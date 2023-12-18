@@ -1,5 +1,6 @@
-cinewebbackend\entities\Usuarios.class
 cinewebbackend\resources\JakartaEE10Resource.class
+cinewebbackend\entities\Usuarios.class
+cinewebbackend\Rest\UsuarioRest.class
 cinewebbackend\control\AbstractBean.class
 cinewebbackend\control\UsuarioBean.class
 cinewebbackend\JakartaRestConfiguration.class

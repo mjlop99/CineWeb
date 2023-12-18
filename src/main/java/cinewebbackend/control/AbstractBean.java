@@ -4,6 +4,8 @@
  */
 package cinewebbackend.control;
 
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
@@ -13,6 +15,8 @@ import jakarta.persistence.criteria.Root;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class AbstractBean<T> implements Serializable {
 
@@ -25,11 +29,15 @@ public abstract class AbstractBean<T> implements Serializable {
     public abstract EntityManager getEntityManager();
 
     public void Create(T registro) throws IllegalStateException, IllegalArgumentException {
-        EntityManager em = getEntityManager();
-        if (registro != null && em != null) {
+
+        EntityManager em = null;
+        if (registro != null) {
+            em = getEntityManager();
             try {
-                em.persist(registro);
-                return;
+                if (em != null) {
+                    em.persist(registro);
+                    return;
+                }
             } catch (Exception e) {
                 throw new IllegalStateException("Error al persistir dato", e);
             }
@@ -38,25 +46,35 @@ public abstract class AbstractBean<T> implements Serializable {
     }
 
     public T Modify(T registroNuevo) throws IllegalStateException, IllegalArgumentException {
-        EntityManager em = getEntityManager();
+        EntityManager em = null;
 
-        if (registroNuevo != null && em != null) {
-            try {
-                return em.merge(registroNuevo);
-            } catch (Exception e) {
-                throw new IllegalStateException("Error al modificar dato", e);
+        if (registroNuevo != null) {
+            em = getEntityManager();
+            if (em != null) {
+                try {
+                    return em.merge(registroNuevo);
+                } catch (Exception e) {
+                    throw new IllegalStateException("Error al modificar dato", e);
+                }
             }
         }
         throw new IllegalArgumentException("El registro o el EntityManager son nulos");
     }
 
     public void Delete(T registroBorrar) throws IllegalStateException, IllegalArgumentException {
-        EntityManager em = getEntityManager();
-        if (registroBorrar != null && em != null) {
+        EntityManager em = null;
+        System.out.println(registroBorrar);
+        if (registroBorrar != null) {
             try {
-                if (em.contains(registroBorrar)) {
+                em = getEntityManager();
+                if (em != null) {
+                    if (!em.contains(registroBorrar)) {
+                        registroBorrar = em.merge(registroBorrar);
+                    }
                     em.remove(registroBorrar);
                     return;
+                } else {
+                    System.out.println("hola");
                 }
             } catch (Exception e) {
                 throw new IllegalStateException("Error al eliminar dato", e);
@@ -66,27 +84,31 @@ public abstract class AbstractBean<T> implements Serializable {
     }
 
     public List<T> FindAll() throws IllegalStateException, IllegalArgumentException {
-        EntityManager em = getEntityManager();
+        EntityManager em = null;
         List<T> registros = Collections.EMPTY_LIST;
-        if (em != null) {
-            try {
+        try {
+            em = getEntityManager();
+            if (em != null) {
+
                 CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
                 cq.select(cq.from(tipoDato));
                 Query q = em.createQuery(cq);
                 return q.getResultList();
-            } catch (Exception e) {
-                throw new IllegalStateException("Error al aceder a los datos", e);
             }
+        } catch (Exception e) {
+            throw new IllegalStateException("Error al aceder a los datos", e);
         }
-        throw new IllegalArgumentException("El registro o el EntityManager son nulos");
+        return registros;
     }
 
     public T FindById(Object id) throws IllegalStateException, IllegalArgumentException {
-        EntityManager em = getEntityManager();
-        List<T> registros = Collections.EMPTY_LIST;
-        if (em != null && id != null) {
+        EntityManager em = null;
+        if (id != null) {
             try {
-                return (T) em.find(tipoDato, id);
+                em = getEntityManager();
+                if (em != null) {
+                    return (T) em.find(tipoDato, id);
+                }
             } catch (Exception e) {
                 throw new IllegalStateException("Error al aceder a los datos", e);
             }
@@ -94,37 +116,50 @@ public abstract class AbstractBean<T> implements Serializable {
         throw new IllegalArgumentException("El registro o el EntityManager son nulos");
     }
 
-    public List<T> FindRange(int first, int pageSize) throws IllegalStateException, IllegalArgumentException {
+    public List<T> FindRange(int first, int pageSize) throws IllegalStateException {
 
-        EntityManager em = getEntityManager();
+        EntityManager em = null;
 
-        if (first >= 0 && pageSize > 0 && em != null) {
+        if (first >= 0 && pageSize > 0) {
+
             try {
+                em = getEntityManager();
                 if (em != null) {
                     CriteriaBuilder cb = em.getCriteriaBuilder();
                     CriteriaQuery cq = cb.createQuery(tipoDato);
                     Root<T> raiz = cq.from(tipoDato);
                     cq.select(raiz);
                     TypedQuery q = em.createQuery(cq);
+
                     q.setFirstResult(first);
                     q.setMaxResults(pageSize);
                     return q.getResultList();
+
                 }
+
             } catch (Exception ex) {
-                throw new IllegalStateException("Error al aceder a los datos", ex);
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
+
             }
+            throw new IllegalStateException();
+
         }
-        throw new IllegalArgumentException();
+        return Collections.EMPTY_LIST;
 
     }
 
     public int count() throws IllegalStateException, IllegalArgumentException {
-        EntityManager em = getEntityManager();
-        if (em != null) {
-            CriteriaBuilder cb = em.getCriteriaBuilder();
-            CriteriaQuery<Long> cq = cb.createQuery(Long.class);
-            cq.select(cb.count(cq.from(tipoDato)));
-            return em.createQuery(cq).getSingleResult().intValue();
+        EntityManager em = null;
+        try {
+            em = getEntityManager();
+            if (em != null) {
+                CriteriaBuilder cb = em.getCriteriaBuilder();
+                CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+                cq.select(cb.count(cq.from(tipoDato)));
+                return em.createQuery(cq).getSingleResult().intValue();
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
         }
         throw new IllegalStateException();
     }

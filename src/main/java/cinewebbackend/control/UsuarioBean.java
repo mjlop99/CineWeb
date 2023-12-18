@@ -15,8 +15,9 @@ import java.io.Serializable;
  *
  * @author mjlopez
  */
-@LocalBean
 @Stateless
+@LocalBean
+
 public class UsuarioBean extends AbstractBean<Usuarios> implements Serializable{
     @PersistenceContext(unitName = "cinePU")
     EntityManager em;
