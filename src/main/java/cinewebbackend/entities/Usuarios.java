@@ -22,11 +22,13 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "usuarios")
 @NamedQueries({
+    @NamedQuery(name = "Usuarios.findCreatedUser", query = "SELECT u FROM Usuarios u WHERE u.email = :email AND u.contrasena = :contrasena"),
     @NamedQuery(name = "Usuarios.findAll", query = "SELECT u FROM Usuarios u"),
     @NamedQuery(name = "Usuarios.findById", query = "SELECT u FROM Usuarios u WHERE u.id = :id"),
     @NamedQuery(name = "Usuarios.findByNombreUsuario", query = "SELECT u FROM Usuarios u WHERE u.nombreUsuario = :nombreUsuario"),
     @NamedQuery(name = "Usuarios.findByEmail", query = "SELECT u FROM Usuarios u WHERE u.email = :email"),
     @NamedQuery(name = "Usuarios.findByContrasena", query = "SELECT u FROM Usuarios u WHERE u.contrasena = :contrasena")})
+
 public class Usuarios implements Serializable {
 
     private static final long serialVersionUID = 1L;

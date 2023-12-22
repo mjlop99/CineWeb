@@ -65,6 +65,29 @@ public class UsuarioRest {
                 .header("missing-parameter", "id")
                 .build();
     }
+        @GET
+        @Path("/Created")
+        @Produces({MediaType.APPLICATION_JSON})
+        public Response login(@QueryParam("email") String email,@QueryParam("contrasena") String contrasena) {
+            if (email != null && contrasena!=null) {
+                Usuarios user= new Usuarios();
+                user.setContrasena(contrasena);
+                user.setEmail(email);
+                Usuarios encontrado = ubean.findUser(user); 
+                if (encontrado != null) {
+                    return Response.status(Response.Status.OK)
+                            .entity(encontrado)
+                            .build();
+                }
+                return Response.status(Response.Status.NOT_FOUND)
+                        .header("not-found", "user or password not compatible")
+                        .build();
+            }
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .header("missing-parameter", "user")
+                    .build();
+        }
+
      @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)

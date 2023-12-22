@@ -1,10 +1,48 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Start Page</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    </head>
-    <body>
-        <h1>Hello World!</h1>
-    </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine Web</title>
+    <link rel="stylesheet" href="assets/style/main.css">
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="logo--container">
+            <img src="assets/images/icons/video.svg" alt="camara de video">
+        </div>
+        <div class="tittle">
+            <p>Cine web app</p>
+        </div>
+
+        <div class="menu-container" id="img-menu-action"><img src="assets/images/icons/menu.svg" alt=""></div>
+        <ul class="nav-bar--option">
+            <li><a href="">Inicio</a></li>
+            <li><a href="">Series</a></li>
+            <li><a href="">Peliculas</a></li>
+            <li><a href="">Estrenos</a></li>
+            <li><a href="">Trending</a></li>
+        </ul>
+        <div class="loging-container">
+            <img src="assets/images/icons/user.svg" alt="fddf">
+          </div>
+          
+
+    </nav>
+    <main>
+        <div class="login-container" id="login-container--main">
+            <form>
+                <h2>Inicia Sesion</h2>
+                <label for="nombre-txt-user">Nombre</label>
+                <input type="text" name="nombre-txt" id="nombre-txt-user"  required>
+                <label for="correo-txt-user">Correo electronico</label>
+                <input type="text" name="correo-txt" id="correo-txt-user"  required>
+                <label for="contraseña-txt-user">contraseña</label>
+                <input type="password" name="contraseña-txt" id="contraseña-txt-user" required>
+            </form>
+            <button type="button" id="button-form">Ingresar</button>
+        </div>
+    </main>
+    <script src="scripts/main.js"></script>
+</body>
 </html>
